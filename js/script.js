@@ -169,3 +169,55 @@ document.getElementById('contactForm').addEventListener('submit', function (e) {
             alert('Error: ' + error.message);
         });
 });
+
+// Add to your existing script.js
+// Toggle rocket details
+document.querySelectorAll('.details-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const card = this.closest('.rocket-card');
+        card.classList.toggle('expanded');
+        
+        // Change button text/icon
+        if (card.classList.contains('expanded')) {
+            this.innerHTML = 'Hide Details <i class="fas fa-chevron-up"></i>';
+        } else {
+            this.innerHTML = 'View Details <i class="fas fa-chevron-down"></i>';
+        }
+    });
+});
+
+// Simple image viewer for gallery
+document.querySelectorAll('.gallery-item').forEach(item => {
+    item.addEventListener('click', function() {
+        const imgUrl = this.style.backgroundImage
+            .replace('url("', '')
+            .replace('")', '');
+        
+        const viewer = document.createElement('div');
+        viewer.style.position = 'fixed';
+        viewer.style.top = '0';
+        viewer.style.left = '0';
+        viewer.style.width = '100%';
+        viewer.style.height = '100%';
+        viewer.style.backgroundColor = 'rgba(0,0,0,0.9)';
+        viewer.style.display = 'flex';
+        viewer.style.justifyContent = 'center';
+        viewer.style.alignItems = 'center';
+        viewer.style.zIndex = '1000';
+        viewer.style.cursor = 'pointer';
+        
+        const img = document.createElement('img');
+        img.src = imgUrl;
+        img.style.maxWidth = '90%';
+        img.style.maxHeight = '90%';
+        img.style.border = '2px solid var(--primary)';
+        img.style.boxShadow = '0 0 30px var(--primary)';
+        
+        viewer.appendChild(img);
+        document.body.appendChild(viewer);
+        
+        viewer.addEventListener('click', () => {
+            viewer.remove();
+        });
+    });
+});
