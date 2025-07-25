@@ -653,3 +653,183 @@ footer {
         height: 40px;
     }
 }
+
+/* Projects Section Styles */
+#projects {
+    background: radial-gradient(circle at center, rgba(255,0,0,0.05) 0%, transparent 50%);
+}
+
+.rocket-projects {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 40px;
+    padding: 0 20px;
+}
+
+.rocket-card {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 0, 0, 0.2);
+}
+
+.rocket-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 0 30px var(--primary);
+}
+
+.rocket-header {
+    padding: 20px;
+    background: linear-gradient(to right, rgba(255,0,0,0.2), transparent);
+    border-bottom: 1px solid var(--primary);
+}
+
+.rocket-header h3 {
+    font-size: 1.8rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+    text-shadow: var(--glow);
+}
+
+.rocket-stats {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.rocket-stats span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+.rocket-image {
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.rocket-image {
+    height: auto; /* Remove fixed height */
+    min-height: 200px; /* Minimum height for placeholder */
+    background-size: contain; /* Show full image without cropping */
+    background-position: center;
+    background-repeat: no-repeat;
+    aspect-ratio: 3/4; /* Optional: Set expected ratio (adjust as needed) */
+    position: relative;
+}
+
+.rocket-summary {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,0,0,0.2);
+}
+
+.rocket-summary p {
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.details-btn {
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.details-btn:hover {
+    background: rgba(255,0,0,0.2);
+    box-shadow: 0 0 10px var(--primary);
+}
+
+.rocket-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+}
+
+.rocket-card.expanded .rocket-details {
+    max-height: 1000px;
+}
+
+.tech-specs {
+    padding: 20px;
+    background: rgba(0,0,0,0.3);
+}
+
+.tech-specs h4 {
+    color: var(--primary);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.tech-specs ul {
+    list-style: none;
+}
+
+.tech-specs li {
+    margin-bottom: 8px;
+    display: flex;
+}
+
+.tech-specs li strong {
+    width: 120px;
+    display: inline-block;
+    color: var(--accent);
+}
+
+.rocket-gallery {
+    padding: 20px;
+}
+
+.rocket-gallery h4 {
+    color: var(--primary);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.gallery-item {
+    height: 100px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255,0,0,0.3);
+}
+
+.gallery-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px var(--primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .rocket-projects {
+        grid-template-columns: 1fr;
+    }
+    
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
