@@ -12,6 +12,79 @@
     font-family: 'Orbitron', 'Arial', sans-serif;
 }
 
+/* Hide default scrollbar */
+::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Custom scroll progress bar */
+.scroll-progress {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary), #ff6666);
+    position: relative;
+    /* transition: width 50ms ease; */
+}
+
+.rocket-head {
+    position: absolute;
+    left: 0;
+    bottom: -18px;
+    z-index: 2;
+    transform-origin: center;
+ /* transition: left 50ms ease; */
+    filter: drop-shadow(0 0 5px var(--primary));
+}
+
+.rocket-head img {
+    width: 30px;
+    height: auto;
+    display: block;
+    transform: rotate(90deg);
+    position: relative;
+    left: 20px;  /* nudged further right */
+}
+
+.exhaust {
+    position: absolute;
+    height: 15px;
+    bottom: -5px;
+    width: 50px;
+    left: -22px;  /* nudge exhaust slightly to the right */
+    background: linear-gradient(90deg, 
+        transparent,
+        rgba(255, 0, 0, 0.3) 20%,
+        rgba(255, 150, 0, 0.5) 40%,
+        rgba(255, 200, 0, 0.7) 60%,
+        rgba(255, 220, 0, 0.8) 80%,
+        rgba(255, 255, 255, 0.9)
+    );
+    filter: blur(3px);
+    transform-origin: right;
+    animation: exhaust-flicker 0.1s infinite;
+}
+
+@keyframes exhaust-flicker {
+    0% { opacity: 0.8; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+    100% { opacity: 0.8; transform: scaleY(1); }
+}
+
 body {
     background-color: var(--secondary);
     color: var(--accent);
