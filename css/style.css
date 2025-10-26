@@ -56,7 +56,7 @@ body {
     height: auto;
     display: block;
     position: relative;
-    left: 20px;  /* nudged further right */
+    left: 20px;
 }
 
 .exhaust {
@@ -910,16 +910,22 @@ footer {
     display: flex;
     justify-content: center; /* centers horizontally */
     align-items: center; /* centers vertically */
-    gap: 10vh; /* space between images */
+    gap: 20vh; /* space between images */
     flex-wrap: wrap;
 }
 
     .sponsors-logos a {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 10%;
-        overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10%;
+    overflow: hidden;
+    height: 100%;
+/* Ensure each logo container is flex and centers vertically */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
     }
 
 .sponsor-logo {

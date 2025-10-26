@@ -12,12 +12,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // Fade in bar as you scroll
     let fade = Math.min(progress / 1, 1); // 0 opacity at top, fully visible after 10% scroll
     progressBar.style.opacity = fade;
-    rocketHead.style.left = `${progress * 1.05}%`;
+    rocketHead.style.left = `${progress}%`;
     rocketHead.style.opacity = fade;
         
         // Update exhaust position
-    exhaust.style.left = `calc(${progress}% + 0px - 5px)`; // Move exhaust 30px to the left
-    exhaust.style.width = `${Math.min(50 + (progress/2), 100)}px`; // Exhaust gets longer as speed increases
+    exhaust.style.left = `${progress}%`;
+    exhaust.style.width = `50px`; // Fixed width for exhaust
     exhaust.style.opacity = fade;
     if (fade === 0) {
         exhaust.style.display = 'none';
