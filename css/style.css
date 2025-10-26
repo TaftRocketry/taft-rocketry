@@ -292,7 +292,7 @@ section {
     flex-wrap: wrap;
     justify-content: center;
     gap: 30px;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
@@ -832,3 +832,28 @@ footer {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+
+.sponsors-logos {
+    display: flex;
+    justify-content: center; /* centers horizontally */
+    align-items: center; /* centers vertically */
+    gap: 10vh; /* space between images */
+    flex-wrap: wrap;
+}
+
+    .sponsors-logos a {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 10%;
+        overflow: hidden;
+    }
+
+.sponsor-logo {
+    object-fit: contain;
+    max-width: 80%;
+    max-height: 80%;
+}
+
+
