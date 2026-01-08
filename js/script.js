@@ -2,6 +2,8 @@ const navLinks = document.querySelector(".nav-links");
 const pageContainer = document.querySelector("[data-page-container]");
 const pageCache = new Map();
 let textStackHandler = null;
+let lottieHandler = null;
+let lottieResizeHandler = null;
 
 const setActiveLink = (link) => {
     if (!navLinks) {
@@ -102,6 +104,168 @@ const initTextStack = () => {
     textStackHandler();
 };
 
+const initScrollLottie = () => {
+    if (lottieHandler) {
+        window.removeEventListener("scroll", lottieHandler);
+        lottieHandler = null;
+    }
+    if (lottieResizeHandler) {
+        window.removeEventListener("resize", lottieResizeHandler);
+        lottieResizeHandler = null;
+    }
+
+    const lottieHost = pageContainer?.querySelector(".scroll-lottie");
+    if (!lottieHost) {
+        return;
+    }
+
+    const textStack = pageContainer?.querySelector(".text-stack");
+    const frameCount = 381;
+    const imageCache = new Map();
+    const queued = new Set();
+    const loadQueue = [];
+    const maxConcurrentLoads = 6;
+    const prefetchRadius = 6;
+    let activeLoads = 0;
+    let lastFrame = -1;
+    let lastDrawn = -1;
+    let cssWidth = 0;
+    let cssHeight = 0;
+
+    lottieHost.innerHTML = "";
+    const canvas = document.createElement("canvas");
+    canvas.className = "scroll-lottie-canvas";
+    lottieHost.appendChild(canvas);
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+        return;
+    }
+
+    const updateCanvasSize = () => {
+        const rect = lottieHost.getBoundingClientRect();
+        cssWidth = Math.max(1, rect.width);
+        cssHeight = Math.max(1, rect.height);
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.floor(cssWidth * dpr);
+        canvas.height = Math.floor(cssHeight * dpr);
+        context.setTransform(dpr, 0, 0, dpr, 0, 0);
+        if (lastFrame >= 0) {
+            drawFrame(lastFrame);
+        }
+    };
+
+    const drawFrame = (index) => {
+        const image = imageCache.get(index);
+        if (!image) {
+            return;
+        }
+        context.clearRect(0, 0, cssWidth, cssHeight);
+        const scale = Math.max(cssWidth / image.width, cssHeight / image.height);
+        const drawWidth = image.width * scale;
+        const drawHeight = image.height * scale;
+        const x = (cssWidth - drawWidth) / 2;
+        const y = (cssHeight - drawHeight) / 2;
+        context.drawImage(image, x, y, drawWidth, drawHeight);
+        lastDrawn = index;
+    };
+
+    const processQueue = () => {
+        while (activeLoads < maxConcurrentLoads && loadQueue.length > 0) {
+            const index = loadQueue.shift();
+            if (index === undefined) {
+                return;
+            }
+            activeLoads += 1;
+            const img = new Image();
+            img.onload = () => {
+                activeLoads -= 1;
+                queued.delete(index);
+                imageCache.set(index, img);
+                if (index === lastFrame) {
+                    drawFrame(index);
+                }
+                processQueue();
+            };
+            img.onerror = () => {
+                activeLoads -= 1;
+                queued.delete(index);
+                processQueue();
+            };
+            img.src = `lottie_images/img_${index}.jpg`;
+        }
+    };
+
+    const queueFrame = (index) => {
+        if (index < 0 || index >= frameCount) {
+            return;
+        }
+        if (imageCache.has(index) || queued.has(index)) {
+            return;
+        }
+        queued.add(index);
+        loadQueue.push(index);
+        processQueue();
+    };
+
+    const queueRange = (center) => {
+        for (let i = center - prefetchRadius; i <= center + prefetchRadius; i += 1) {
+            queueFrame(i);
+        }
+    };
+
+    const updateFrame = () => {
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        let progress = 0;
+
+        if (textStack) {
+            const rect = textStack.getBoundingClientRect();
+            const start = window.scrollY + rect.top;
+            const height = rect.height || 1;
+            const anchor = window.scrollY + viewportHeight / 2;
+            progress = Math.min(1, Math.max(0, (anchor - start) / height));
+        } else {
+            const scrollable = Math.max(1, document.body.scrollHeight - viewportHeight);
+            progress = Math.min(1, Math.max(0, window.scrollY / scrollable));
+        }
+
+        const frameIndex = Math.round(progress * (frameCount - 1));
+        if (frameIndex === lastFrame) {
+            return;
+        }
+        lastFrame = frameIndex;
+        queueRange(frameIndex);
+        if (imageCache.has(frameIndex)) {
+            drawFrame(frameIndex);
+        } else if (lastDrawn >= 0 && imageCache.has(lastDrawn)) {
+            drawFrame(lastDrawn);
+        }
+    };
+
+    let ticking = false;
+    lottieHandler = () => {
+        if (ticking) {
+            return;
+        }
+        ticking = true;
+        requestAnimationFrame(() => {
+            ticking = false;
+            updateFrame();
+        });
+    };
+
+    lottieResizeHandler = () => {
+        updateCanvasSize();
+        updateFrame();
+    };
+
+    updateCanvasSize();
+    queueRange(0);
+    window.addEventListener("scroll", lottieHandler);
+    window.addEventListener("resize", lottieResizeHandler);
+    lottieHandler();
+};
+
 const loadPage = async (pageName, src) => {
     if (!pageContainer) {
         return;
@@ -110,6 +274,7 @@ const loadPage = async (pageName, src) => {
         pageContainer.innerHTML = pageCache.get(pageName);
         initPageInteractions();
         initTextStack();
+        initScrollLottie();
         return;
     }
     try {
@@ -122,6 +287,7 @@ const loadPage = async (pageName, src) => {
         pageContainer.innerHTML = html;
         initPageInteractions();
         initTextStack();
+        initScrollLottie();
     } catch (error) {
         pageContainer.textContent = `Unable to load ${pageName}.`;
     }

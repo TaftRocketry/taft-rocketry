@@ -2,7 +2,7 @@
 
 :root {
     color-scheme: dark;
-    --bg: #0f1115;
+    --bg: #000000;
     --panel: #1a1f27;
     --stroke: #2b313c;
     --text: #f2f4f7;
@@ -83,23 +83,42 @@ main {
     padding-left: 10%;
     padding-top: 40px;
     padding-bottom: 40px;
-    font-size: 4rem;
+    font-size: 5rem;
     margin: 0 0 12px;
     color: var(--accent);
+    font-weight: 1000;
 }
 
 .home-hero-wrap {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: space-between;
     position: relative;
 }
 
 .text-stack {
     position: relative;
-    width: 50%;
+    width: 50vw;
     height: 8000px;
     padding: 20px;
+    order: 2;
+}
+.scroll-lottie {
+    position: sticky;
+    top: 0;
+    width: 50vw;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    order: 1;
+    
+}
+
+.scroll-lottie-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    
 }
 
 .text-box {
@@ -143,10 +162,11 @@ main {
 .home-intro {
     padding: 50px;
     height: 500px;
-    width: 80%;
+    width: 110%;
     background-color: rgb(194, 47, 47);
     border-radius: 10px;
     transform: translateX(20%);
+    font-size: 30px;
 }
 
 .panel {
