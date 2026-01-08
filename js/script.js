@@ -1,252 +1,154 @@
-document.addEventListener('DOMContentLoaded', function () {
-    // Scroll Progress Bar
-    const progressBar = document.querySelector('.progress-bar');
-    const rocketHead = document.querySelector('.rocket-head');
-    const exhaust = document.querySelector('.exhaust');
+const navLinks = document.querySelector(".nav-links");
+const pageContainer = document.querySelector("[data-page-container]");
+const pageCache = new Map();
+let textStackHandler = null;
 
-    function updateProgress() {
-        const windowHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = (window.scrollY / windowHeight) * 100;
-        
-    progressBar.style.width = `${progress}%`;
-    // Fade in bar as you scroll
-    let fade = Math.min(progress / 1, 1); // 0 opacity at top, fully visible after 10% scroll
-    progressBar.style.opacity = fade;
-    rocketHead.style.left = `${progress}%`;
-    rocketHead.style.opacity = fade;
-        
-        // Update exhaust position
-    exhaust.style.left = `${progress}%`;
-    exhaust.style.width = `50px`; // Fixed width for exhaust
-    exhaust.style.opacity = fade;
-    if (fade === 0) {
-        exhaust.style.display = 'none';
-    } else {
-        exhaust.style.display = 'block';
+const setActiveLink = (link) => {
+    if (!navLinks) {
+        return;
     }
-    }
-
-    window.addEventListener('scroll', updateProgress);
-    updateProgress(); // Initial call
-    // Create stars
-    const starsContainer = document.querySelector('.stars');
-    for (let i = 0; i < 200; i++) {
-        const star = document.createElement('div');
-        star.classList.add('star');
-        star.style.left = `${Math.random() * 100}%`;
-        star.style.top = `${Math.random() * 100}%`;
-        star.style.width = `${Math.random() * 3 + 1}px`;
-        star.style.height = star.style.width;
-        star.style.setProperty('--opacity', Math.random());
-        star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
-        starsContainer.appendChild(star);
-    }
-
-    // Create matrix rain effect
-    const matrixRain = document.getElementById('matrixRain');
-    const characters = "01";
-    const fontSize = 14;
-    const columns = Math.floor(window.innerWidth / fontSize);
-    const rows = Math.floor(window.innerHeight / fontSize);
-
-    for (let i = 0; i < columns; i++) {
-        const column = document.createElement('div');
-        column.style.position = 'absolute';
-        column.style.top = '0';
-        column.style.left = `${i * fontSize}px`;
-        column.style.width = `${fontSize}px`;
-        column.style.height = '100%';
-        column.style.color = '#0f0';
-        column.style.fontFamily = 'monospace';
-        column.style.fontSize = `${fontSize}px`;
-        column.style.lineHeight = `${fontSize}px`;
-        column.style.textAlign = 'center';
-        column.style.overflow = 'hidden';
-        column.dataset.position = '0';
-        column.dataset.length = Math.floor(Math.random() * rows / 2) + rows / 2;
-        column.dataset.speed = Math.random() * 0.5 + 0.5;
-        matrixRain.appendChild(column);
-
-        updateColumn(column);
-    }
-
-    function updateColumn(column) {
-        const position = parseInt(column.dataset.position);
-        const length = parseInt(column.dataset.length);
-        const speed = parseFloat(column.dataset.speed);
-
-        let content = '';
-        for (let i = 0; i < rows; i++) {
-            if (i === position) {
-                content += characters.charAt(Math.floor(Math.random() * characters.length));
-            } else if (i < position && i > position - length) {
-                content += characters.charAt(Math.floor(Math.random() * characters.length));
-            } else {
-                content += ' ';
-            }
-        }
-
-        column.textContent = content;
-
-        column.dataset.position = (position + 1) % (rows + length);
-
-        setTimeout(() => updateColumn(column), 100 / speed);
-    }
-
-    // Create floating particles
-    document.addEventListener('mousemove', (e) => {
-        const particle = document.createElement('div');
-        particle.classList.add('particle');
-        particle.style.left = `${e.clientX}px`;
-        particle.style.top = `${e.clientY}px`;
-        particle.style.width = `${Math.random() * 10 + 5}px`;
-        particle.style.height = particle.style.width;
-        particle.style.opacity = Math.random() * 0.5 + 0.5;
-        document.body.appendChild(particle);
-
-        setTimeout(() => {
-            particle.style.transform = `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px)`;
-            particle.style.opacity = '0';
-
-            setTimeout(() => {
-                particle.remove();
-            }, 1000);
-        }, 50);
+    navLinks.querySelectorAll("a").forEach((navLink) => {
+        navLink.classList.toggle("is-active", navLink === link);
     });
+};
 
-    // Scroll to sections
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-
-            document.querySelector(this.getAttribute('href')).scrollIntoView({
-                behavior: 'smooth'
+const initPageInteractions = () => {
+    const specsButtons = pageContainer?.querySelectorAll("[data-show-specs]");
+    const specsPanels = pageContainer?.querySelectorAll("[data-specs-detail]");
+    if (!specsButtons || !specsPanels) {
+        return;
+    }
+    specsButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const target = button.dataset.showSpecs;
+            if (!target) {
+                return;
+            }
+            specsPanels.forEach((panel) => {
+                const panelId = panel.dataset.specsDetail;
+                panel.classList.toggle("is-hidden", panelId && panelId !== target);
             });
-
-            // Close mobile menu if open
-            document.querySelector('.nav-links').classList.remove('active');
         });
     });
+};
 
-    // Hamburger menu
-    document.querySelector('.hamburger').addEventListener('click', () => {
-        document.querySelector('.nav-links').classList.toggle('active');
-    });
-
-    // Scroll down button
-    document.querySelector('.scroll-down').addEventListener('click', () => {
-        document.querySelector('#about').scrollIntoView({
-            behavior: 'smooth'
-        });
-    });
-
-    // Rocket animation
-    function createRocket() {
-        const rocket = document.createElement('div');
-        rocket.classList.add('rocket');
-        rocket.style.left = `${Math.random() * 100}%`;
-        document.querySelector('header').appendChild(rocket);
-
-        setTimeout(() => {
-            rocket.remove();
-        }, 15000);
+const initTextStack = () => {
+    if (textStackHandler) {
+        window.removeEventListener("scroll", textStackHandler);
+        window.removeEventListener("resize", textStackHandler);
+        textStackHandler = null;
     }
 
-    setInterval(createRocket, 3000);
+    const textStack = pageContainer?.querySelector(".text-stack");
+    const boxes = textStack ? Array.from(textStack.querySelectorAll(".text-box")) : [];
+    if (!textStack || boxes.length === 0) {
+        return;
+    }
 
-    // Page load animation
-    setTimeout(() => {
-        document.querySelector('.logo').style.opacity = '1';
-        document.querySelector('.tagline').style.opacity = '1';
-    }, 500);
+    let ticking = false;
+    const update = () => {
+        const rect = textStack.getBoundingClientRect();
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const stackTop = window.scrollY + rect.top;
+        const stackHeight = rect.height || 1;
+        const anchor = window.scrollY + viewportHeight / 2;
+        const relative = Math.min(stackHeight, Math.max(0, anchor - stackTop));
+        const fallbackSegment = stackHeight / boxes.length;
 
-    // Parallax effect
-    document.addEventListener('mousemove', (e) => {
-        const x = e.clientX / window.innerWidth;
-        const y = e.clientY / window.innerHeight;
+        boxes.forEach((box, index) => {
+            const start = Number.parseFloat(box.dataset.start);
+            const end = Number.parseFloat(box.dataset.end);
+            const rangeStart = Number.isFinite(start) ? start : index * fallbackSegment;
+            const rangeEnd = Number.isFinite(end) ? end : rangeStart + fallbackSegment;
+            const rangeSize = Math.max(1, rangeEnd - rangeStart);
+            const local = (relative - rangeStart) / rangeSize;
+            let opacity = 0;
+            let yPercent = 5;
 
-        document.querySelector('.logo').style.transform = `translate(-50%, -50%) translate(${x * 20 - 10}px, ${y * 20 - 10}px)`;
-    });
-});
-
-
-// CONTACT FORM FIX USING FORMSUBMIT AJAX
-document.getElementById('contactForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const form = e.target;
-    const formData = new FormData(form);
-
-    fetch('https://formsubmit.co/ajax/tafthighrocketry@gmail.com', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'Accept': 'application/json'
-        }
-    })
-        .then(response => {
-            if (response.ok) {
-                const confirmation = document.getElementById('confirmation');
-                confirmation.style.display = 'block';
-                form.reset();
-                setTimeout(() => confirmation.style.display = 'none', 5000); // hide after 5s
-            } else {
-                alert('There was a problem sending your message.');
+            if (local >= 0 && local <= 1) {
+                if (local < 0.2) {
+                    const t = local / 0.2;
+                    opacity = t;
+                    yPercent = 5 - t * 5;
+                } else if (local > 0.8) {
+                    const t = (local - 0.8) / 0.2;
+                    opacity = 1 - t;
+                    yPercent = -t * 5;
+                } else {
+                    opacity = 1;
+                    yPercent = 0;
+                }
             }
-        })
-        .catch(error => {
-            alert('Error: ' + error.message);
-        });
-});
 
-// Add to your existing script.js
-// Toggle rocket details
-document.querySelectorAll('.details-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const card = this.closest('.rocket-card');
-        card.classList.toggle('expanded');
-        
-        // Change button text/icon
-        if (card.classList.contains('expanded')) {
-            this.innerHTML = 'Hide Details <i class="fas fa-chevron-up"></i>';
-        } else {
-            this.innerHTML = 'View Details <i class="fas fa-chevron-down"></i>';
+            box.style.opacity = opacity.toFixed(3);
+            box.style.transform = `translateY(calc(-50% + ${yPercent.toFixed(2)}%))`;
+            box.style.zIndex = Math.round(opacity * 10).toString();
+        });
+    };
+
+    textStackHandler = () => {
+        if (ticking) {
+            return;
         }
-    });
-});
-
-// Simple image viewer for gallery
-document.querySelectorAll('.gallery-item').forEach(item => {
-    item.addEventListener('click', function() {
-        const imgUrl = this.style.backgroundImage
-            .replace('url("', '')
-            .replace('")', '');
-        
-        const viewer = document.createElement('div');
-        viewer.style.position = 'fixed';
-        viewer.style.top = '0';
-        viewer.style.left = '0';
-        viewer.style.width = '100%';
-        viewer.style.height = '100%';
-        viewer.style.backgroundColor = 'rgba(0,0,0,0.9)';
-        viewer.style.display = 'flex';
-        viewer.style.justifyContent = 'center';
-        viewer.style.alignItems = 'center';
-        viewer.style.zIndex = '1000';
-        viewer.style.cursor = 'pointer';
-        
-        const img = document.createElement('img');
-        img.src = imgUrl;
-        img.style.maxWidth = '90%';
-        img.style.maxHeight = '90%';
-        img.style.border = '2px solid var(--primary)';
-        img.style.boxShadow = '0 0 30px var(--primary)';
-        
-        viewer.appendChild(img);
-        document.body.appendChild(viewer);
-        
-        viewer.addEventListener('click', () => {
-            viewer.remove();
+        ticking = true;
+        requestAnimationFrame(() => {
+            ticking = false;
+            update();
         });
+    };
+
+    window.addEventListener("scroll", textStackHandler);
+    window.addEventListener("resize", textStackHandler);
+    textStackHandler();
+};
+
+const loadPage = async (pageName, src) => {
+    if (!pageContainer) {
+        return;
+    }
+    if (pageCache.has(pageName)) {
+        pageContainer.innerHTML = pageCache.get(pageName);
+        initPageInteractions();
+        initTextStack();
+        return;
+    }
+    try {
+        const response = await fetch(src);
+        if (!response.ok) {
+            throw new Error(`Failed to load ${pageName}`);
+        }
+        const html = await response.text();
+        pageCache.set(pageName, html);
+        pageContainer.innerHTML = html;
+        initPageInteractions();
+        initTextStack();
+    } catch (error) {
+        pageContainer.textContent = `Unable to load ${pageName}.`;
+    }
+};
+
+const getLinkForPage = (pageName) => {
+    return navLinks?.querySelector(`a[data-page="${pageName}"]`);
+};
+
+if (navLinks) {
+    navLinks.addEventListener("click", (event) => {
+        const link = event.target.closest("a[data-page][data-src]");
+        if (!link) {
+            return;
+        }
+        event.preventDefault();
+        const pageName = link.dataset.page;
+        const src = link.dataset.src;
+        loadPage(pageName, src);
+        history.replaceState(null, "", link.getAttribute("href"));
+        setActiveLink(link);
     });
-});
+}
+
+const initialPage = window.location.hash.replace("#", "") || "home";
+const initialLink = getLinkForPage(initialPage) || navLinks?.querySelector("a[data-page][data-src]");
+if (initialLink) {
+    loadPage(initialLink.dataset.page, initialLink.dataset.src);
+    setActiveLink(initialLink);
+}
