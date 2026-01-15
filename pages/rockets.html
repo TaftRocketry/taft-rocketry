@@ -1,3 +1,51 @@
 <section class="page page-rockets" data-page="rockets">
-    <h2>Rockets</h2>
+    <section class="rocket-hero panel">
+        <div class="rocket-info">
+            <p class="specs-label">Flight Hardware</p>
+            <h2 data-rocket-name>Green Goblin</h2>
+            <p data-rocket-description>
+                A carbon-sleeved, high-impulse vehicle built for stability and clean staging with our current recovery
+                package.
+            </p>
+            <div class="rocket-stats" data-rocket-stats>
+                <div class="spec-block">
+                    <span class="spec-label">Apogee</span>
+                    <p>12,300 ft</p>
+                </div>
+                <div class="spec-block">
+                    <span class="spec-label">Motor</span>
+                    <p>J-Class</p>
+                </div>
+                <div class="spec-block">
+                    <span class="spec-label">Status</span>
+                    <p>Retired</p>
+                </div>
+            </div>
+        </div>
+        <div class="rocket-media">
+            <img data-rocket-image src="images/greengoblin.JPG" alt="Green Goblin rocket" />
+        </div>
+    </section>
+
+    <section class="rocket-carousel panel">
+        <div class="rocket-thumbs" data-rocket-thumbs>
+            <button class="rocket-thumb is-prev" type="button" data-rocket-thumb="prev">
+                <img src="images/goldrush.JPG" alt="Previous rocket preview" />
+            </button>
+            <button class="rocket-thumb is-current" type="button" data-rocket-thumb="current">
+                <img src="images/greengoblin.JPG" alt="Current rocket preview" />
+            </button>
+            <button class="rocket-thumb is-next" type="button" data-rocket-thumb="next">
+                <img src="images/rocketlatest.png" alt="Next rocket preview" />
+            </button>
+        </div>
+        <div class="rocket-controls">
+            <button class="rocket-arrow" type="button" data-rocket-nav="prev" aria-label="Previous rocket">
+                &#8592;
+            </button>
+            <button class="rocket-arrow" type="button" data-rocket-nav="next" aria-label="Next rocket">
+                &#8594;
+            </button>
+        </div>
+    </section>
 </section>

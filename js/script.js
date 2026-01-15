@@ -32,6 +32,139 @@ const initPageInteractions = () => {
             });
         });
     });
+
+    initRocketCarousel();
+};
+
+const initRocketCarousel = () => {
+    const rocketSection = pageContainer?.querySelector(".page-rockets");
+    if (!rocketSection) {
+        return;
+    }
+
+    const rockets = [
+        {
+            name: "Green Goblin",
+            description:
+                "A carbon-sleeved, high-impulse vehicle built for stability and clean staging with our current recovery package.",
+            image: "images/greengoblin.JPG",
+            stats: [
+                { label: "Apogee", value: "12,300 ft" },
+                { label: "Motor", value: "J-Class" },
+                { label: "Status", value: "Retired" },
+            ],
+        },
+        {
+            name: "Gold Rush",
+            description:
+                "Our last flight article tuned for consistent avionics and smoother separation dynamics in high winds.",
+            image: "images/goldrush.JPG",
+            stats: [
+                { label: "Apogee", value: "18,950 ft" },
+                { label: "Motor", value: "K-Class" },
+                { label: "Status", value: "Last Rocket" },
+            ],
+        },
+        {
+            name: "Next Vehicle",
+            description:
+                "The upcoming design focuses on lighter airframe mass and streamlined ground operations for rapid turnarounds.",
+            image: "images/rocketlatest.png",
+            stats: [
+                { label: "Apogee", value: "Target 25,000 ft" },
+                { label: "Motor", value: "K-Class" },
+                { label: "Status", value: "In Build" },
+            ],
+        },
+    ];
+
+    const nameEl = rocketSection.querySelector("[data-rocket-name]");
+    const descriptionEl = rocketSection.querySelector("[data-rocket-description]");
+    const imageEl = rocketSection.querySelector("[data-rocket-image]");
+    const statsWrap = rocketSection.querySelector("[data-rocket-stats]");
+    const thumbButtons = rocketSection.querySelectorAll("[data-rocket-thumb]");
+    const navButtons = rocketSection.querySelectorAll("[data-rocket-nav]");
+
+    if (!nameEl || !descriptionEl || !imageEl || rockets.length === 0) {
+        return;
+    }
+
+    let currentIndex = 0;
+
+    const renderStats = (stats) => {
+        if (!statsWrap) {
+            return;
+        }
+        statsWrap.innerHTML = "";
+        stats.forEach((stat) => {
+            const block = document.createElement("div");
+            block.className = "spec-block";
+            const label = document.createElement("span");
+            label.className = "spec-label";
+            label.textContent = stat.label;
+            const value = document.createElement("p");
+            value.textContent = stat.value;
+            block.append(label, value);
+            statsWrap.append(block);
+        });
+    };
+
+    const updateThumb = (button, rocket, position) => {
+        if (!button || !rocket) {
+            return;
+        }
+        const img = button.querySelector("img");
+        if (img) {
+            img.src = rocket.image;
+            img.alt = `${rocket.name} rocket preview`;
+        }
+        button.dataset.rocketIndex = position.toString();
+        button.classList.toggle("is-current", position === currentIndex);
+    };
+
+    const updateRocket = (nextIndex) => {
+        const count = rockets.length;
+        currentIndex = (nextIndex + count) % count;
+        const rocket = rockets[currentIndex];
+        nameEl.textContent = rocket.name;
+        descriptionEl.textContent = rocket.description;
+        imageEl.src = rocket.image;
+        imageEl.alt = `${rocket.name} rocket`;
+        renderStats(rocket.stats);
+
+        const prevIndex = (currentIndex - 1 + count) % count;
+        const nextIdx = (currentIndex + 1) % count;
+
+        thumbButtons.forEach((button) => {
+            const slot = button.dataset.rocketThumb;
+            if (slot === "prev") {
+                updateThumb(button, rockets[prevIndex], prevIndex);
+            } else if (slot === "current") {
+                updateThumb(button, rocket, currentIndex);
+            } else if (slot === "next") {
+                updateThumb(button, rockets[nextIdx], nextIdx);
+            }
+        });
+    };
+
+    navButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const direction = button.dataset.rocketNav;
+            updateRocket(direction === "next" ? currentIndex + 1 : currentIndex - 1);
+        });
+    });
+
+    thumbButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const target = Number.parseInt(button.dataset.rocketIndex || "", 10);
+            if (Number.isNaN(target)) {
+                return;
+            }
+            updateRocket(target);
+        });
+    });
+
+    updateRocket(0);
 };
 
 const initTextStack = () => {
