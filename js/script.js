@@ -48,6 +48,7 @@ const initRocketCarousel = () => {
             description:
                 "A carbon-sleeved, high-impulse vehicle built for stability and clean staging with our current recovery package.",
             image: "images/greengoblin.JPG",
+            theme: "theme-goblin",
             stats: [
                 { label: "Apogee", value: "12,300 ft" },
                 { label: "Motor", value: "J-Class" },
@@ -59,6 +60,7 @@ const initRocketCarousel = () => {
             description:
                 "Our last flight article tuned for consistent avionics and smoother separation dynamics in high winds.",
             image: "images/goldrush.JPG",
+            theme: "theme-gold",
             stats: [
                 { label: "Apogee", value: "18,950 ft" },
                 { label: "Motor", value: "K-Class" },
@@ -70,6 +72,7 @@ const initRocketCarousel = () => {
             description:
                 "The upcoming design focuses on lighter airframe mass and streamlined ground operations for rapid turnarounds.",
             image: "images/rocketlatest.png",
+            theme: "theme-next",
             stats: [
                 { label: "Apogee", value: "Target 25,000 ft" },
                 { label: "Motor", value: "K-Class" },
@@ -82,6 +85,8 @@ const initRocketCarousel = () => {
     const descriptionEl = rocketSection.querySelector("[data-rocket-description]");
     const imageEl = rocketSection.querySelector("[data-rocket-image]");
     const statsWrap = rocketSection.querySelector("[data-rocket-stats]");
+    const heroPanel = rocketSection.querySelector("[data-rocket-hero]");
+    const carouselPanel = rocketSection.querySelector("[data-rocket-carousel]");
     const thumbButtons = rocketSection.querySelectorAll("[data-rocket-thumb]");
     const navButtons = rocketSection.querySelectorAll("[data-rocket-nav]");
 
@@ -131,6 +136,11 @@ const initRocketCarousel = () => {
         imageEl.src = rocket.image;
         imageEl.alt = `${rocket.name} rocket`;
         renderStats(rocket.stats);
+        if (heroPanel && carouselPanel) {
+            const theme = rocket.theme || "";
+            heroPanel.dataset.theme = theme;
+            carouselPanel.dataset.theme = theme;
+        }
 
         const prevIndex = (currentIndex - 1 + count) % count;
         const nextIdx = (currentIndex + 1) % count;
