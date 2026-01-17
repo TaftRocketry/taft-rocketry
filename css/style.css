@@ -16,12 +16,20 @@
     box-sizing: border-box;
 }
 
+html,
 body {
     margin: 0;
-    min-height: 100vh;
+    min-height: 100%;
     font-family: "Space Grotesk", "Segoe UI", sans-serif;
     background: var(--bg);
     color: var(--text);
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
 }
 
 nav {
@@ -34,6 +42,7 @@ nav {
     padding-top: 16px;
     padding-bottom: 16px;
     padding-left: 10px;
+    padding-right: 16px;
     background: var(--panel);
     border-bottom: 1px solid var(--stroke);
 }
@@ -82,12 +91,12 @@ main {
 
 .page-home {
     position: relative;
-    padding-left: 140px;
+    padding-right: 140px;
 }
 
 .scroll-indicator {
     position: fixed;
-    left: 28px;
+    right: 28px;
     top: 96px;
     height: calc(100vh - 96px);
     z-index: 10;
@@ -205,14 +214,17 @@ body.has-scroll-indicator::-webkit-scrollbar {
 .map-container {
     position: relative;
     z-index: 1;
+    /* padding-right: 20px; */
 }
 
 .text-stack {
     position: relative;
     width: 50%;
     height: 8000px;
-    padding: 20px;
+    /* padding: 20px; */
     order: 2;
+    padding-right: 60px;
+    padding-left: 0px;
 }
 .scroll-lottie {
     position: sticky;
@@ -361,6 +373,11 @@ body.has-scroll-indicator::-webkit-scrollbar {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 16px;
+    padding-top: 10%;
+    align-items: center;
+    justify-items: center;
+    align-content: center;
+    
 }
 
 .member-card,
@@ -577,6 +594,108 @@ body.has-scroll-indicator::-webkit-scrollbar {
     background: radial-gradient(circle at top left, rgba(30, 40, 80, 0.25), transparent 55%);
 }
 
+.page-sponsors {
+    gap: 28px;
+    padding: 48px 6vw 90px;
+    align-content: start;
+    background: radial-gradient(circle at top right, rgba(80, 30, 30, 0.2), transparent 55%);
+}
+
+.sponsors-header {
+    display: grid;
+    gap: 12px;
+    max-width: 720px;
+}
+
+.sponsors-kicker {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+.page-sponsors .section-title {
+    margin: 0;
+    letter-spacing: 0.18em;
+}
+
+.sponsors-intro {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.page-sponsors .sponsor-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.page-sponsors .sponsor-grid > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-sponsors .sponsor-grid > div > a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.page-sponsors .sponsor-card {
+    border: 1px solid var(--stroke);
+    background: rgba(20, 24, 32, 0.92);
+    border-radius: 18px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    text-decoration: none;
+    color: var(--text);
+    text-transform: none;
+    letter-spacing: normal;
+    min-height: 0;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.page-sponsors .sponsor-card:hover,
+.page-sponsors .sponsor-card:focus-visible {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+}
+
+.sponsor-logo-wrap {
+    display: grid;
+    place-items: center;
+    min-height: 190px;
+    border-radius: 14px;
+    background: #11161d;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sponsor-logo {
+    height: 160px;
+    max-width: min(280px, 90%);
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.4));
+}
+
+.sponsor-meta h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.sponsor-meta p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
 .page-team::before {
     content: "";
     position: absolute;
@@ -753,7 +872,7 @@ body.has-scroll-indicator::-webkit-scrollbar {
     }
 
     .page-home {
-        padding-left: 0;
+        padding-right: 0;
     }
 
     body.has-scroll-indicator {
@@ -807,6 +926,7 @@ body.has-scroll-indicator::-webkit-scrollbar {
 
 .map-container iframe {
   filter: invert(90%) hue-rotate(180deg) brightness(90%) contrast(95%);
+  border-radius: 42px;
 }
 
 footer {
@@ -822,6 +942,19 @@ footer {
     gap: 20px; 
     padding-top: 20px;
     margin-bottom: 20px;
+}
+
+.nav-social-links {
+    margin-left: auto;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 0;
+    margin-bottom: 0;
+    gap: 14px;
+}
+
+.nav-social-links .social-link {
+    font-size: 1.2rem;
 }
 
 .social-link {
