@@ -82,6 +82,96 @@ main {
 
 .page-home {
     position: relative;
+    padding-left: 140px;
+}
+
+.scroll-indicator {
+    position: fixed;
+    left: 28px;
+    top: 96px;
+    height: calc(100vh - 96px);
+    z-index: 10;
+    display: flex;
+    flex-direction: row;
+    gap: 22px;
+    align-items: center;
+    font-size: 1rem;
+    width: 140px;
+    background: transparent;
+}
+
+.scroll-progress {
+    display: flex;
+    align-items: center;
+}
+
+.scroll-progress-bar {
+    width: 14px;
+    height: calc(100% - 48px);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    position: relative;
+    border: 2px solid var(--accent);
+    box-sizing: border-box;
+}
+
+.scroll-progress-fill {
+    display: block;
+    width: 100%;
+    height: 0;
+    background: var(--accent);
+    transition: height 0.2s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.scroll-titles {
+    position: relative;
+    height: 100%;
+    min-width: 160px;
+}
+
+.scroll-title {
+    position: absolute;
+    left: 0;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: var(--muted);
+    cursor: pointer;
+    text-align: left;
+    transform: translateY(-50%);
+    transform-origin: left center;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.scroll-title.is-active {
+    color: var(--text);
+    transform: translateY(-50%) scale(1.6);
+}
+
+.scroll-title:focus-visible {
+    outline: 1px solid var(--accent);
+    outline-offset: 4px;
+    border-radius: 6px;
+}
+
+.scroll-anchor {
+    position: relative;
+    width: 1px;
+    height: 1px;
+}
+
+body.has-scroll-indicator {
+    scrollbar-width: none;
+}
+
+body.has-scroll-indicator::-webkit-scrollbar {
+    width: 0;
+    height: 0;
 }
 
 .title{
@@ -182,7 +272,7 @@ main {
 
 .home-intro {
     padding: 50px;
-    height: 500px;
+    height: fit-content;
     width: 110%;
     background-color: rgb(194, 47, 47);
     border-radius: 10px;
@@ -656,6 +746,23 @@ main {
     .member-image {
         width: min(80%, 260px);
         align-self: center;
+    }
+
+    .scroll-indicator {
+        display: none;
+    }
+
+    .page-home {
+        padding-left: 0;
+    }
+
+    body.has-scroll-indicator {
+        scrollbar-width: auto;
+    }
+
+    body.has-scroll-indicator::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
     }
 }
 

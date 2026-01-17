@@ -4,6 +4,8 @@ const pageCache = new Map();
 let textStackHandler = null;
 let lottieHandler = null;
 let lottieResizeHandler = null;
+let scrollIndicatorHandler = null;
+let scrollIndicatorResizeHandler = null;
 
 const setActiveLink = (link) => {
     if (!navLinks) {
@@ -219,6 +221,162 @@ const initRocketCarousel = () => {
     });
 
     updateRocket(0);
+};
+
+const initScrollIndicator = () => {
+    if (scrollIndicatorHandler) {
+        window.removeEventListener("scroll", scrollIndicatorHandler);
+        scrollIndicatorHandler = null;
+    }
+    if (scrollIndicatorResizeHandler) {
+        window.removeEventListener("resize", scrollIndicatorResizeHandler);
+        scrollIndicatorResizeHandler = null;
+    }
+
+    const indicator = pageContainer?.querySelector(".scroll-indicator");
+    if (!indicator) {
+        document.body.classList.remove("has-scroll-indicator");
+        return;
+    }
+
+    document.body.classList.add("has-scroll-indicator");
+
+    const progressFill = indicator.querySelector("[data-scroll-fill]");
+    const list = indicator.querySelector("[data-scroll-list]");
+    if (!list) {
+        return;
+    }
+
+    const textStack = pageContainer?.querySelector(".text-stack");
+    const textBoxes = textStack ? Array.from(textStack.querySelectorAll(".text-box")) : [];
+    const sectionElements = Array.from(pageContainer.querySelectorAll("[data-scroll-title]"));
+    const sections = sectionElements
+        .map((element) => {
+            const title = element.dataset.scrollTitle?.trim();
+            if (!title) {
+                return null;
+            }
+            return {
+                element,
+                title,
+                isTextBox: element.classList.contains("text-box"),
+                start: Number.parseFloat(element.dataset.start || ""),
+            };
+        })
+        .filter(Boolean);
+
+    list.innerHTML = "";
+    const buttons = sections.map((section, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "scroll-title";
+        button.textContent = section.title;
+        button.dataset.scrollIndex = index.toString();
+        list.append(button);
+        return button;
+    });
+
+    const getStackMetrics = () => {
+        if (!textStack || textBoxes.length === 0) {
+            return null;
+        }
+        const rect = textStack.getBoundingClientRect();
+        const stackTop = window.scrollY + rect.top;
+        const stackHeight = rect.height || 1;
+        const fallbackSegment = stackHeight / textBoxes.length;
+        return { stackTop, stackHeight, fallbackSegment };
+    };
+
+    const getSectionTop = (section, index, stackMetrics) => {
+        if (section.isTextBox && stackMetrics) {
+            const start = Number.isFinite(section.start)
+                ? section.start
+                : index * stackMetrics.fallbackSegment;
+            return stackMetrics.stackTop + start;
+        }
+        const rect = section.element.getBoundingClientRect();
+        return window.scrollY + rect.top;
+    };
+
+    let sectionProgresses = [];
+
+    const syncButtonPositions = () => {
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const scrollable = Math.max(1, document.documentElement.scrollHeight - viewportHeight);
+        const stackMetrics = getStackMetrics();
+        const listHeight = list.getBoundingClientRect().height || 1;
+        const bar = indicator.querySelector(".scroll-progress-bar");
+        if (bar) {
+            bar.style.height = `${listHeight}px`;
+        }
+        sectionProgresses = sections.map((section, index) => {
+            const top = getSectionTop(section, index, stackMetrics);
+            const progress = Math.min(1, Math.max(0, top / scrollable));
+            const offset = index === sections.length - 1 ? -1 : 0;
+            buttons[index].style.top = `${(progress * 100 + offset).toFixed(2)}%`;
+            return progress;
+        });
+    };
+
+    list.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-scroll-index]");
+        if (!button) {
+            return;
+        }
+        const index = Number.parseInt(button.dataset.scrollIndex || "", 10);
+        if (Number.isNaN(index) || !sections[index]) {
+            return;
+        }
+        const stackMetrics = getStackMetrics();
+        const targetTop = getSectionTop(sections[index], index, stackMetrics);
+        window.scrollTo({ top: targetTop, behavior: "smooth" });
+    });
+
+    let ticking = false;
+
+    const update = () => {
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const scrollable = Math.max(1, document.documentElement.scrollHeight - viewportHeight);
+        const progress = Math.min(1, Math.max(0, window.scrollY / scrollable));
+        const progressPercent = Math.round(progress * 100);
+        if (progressFill) {
+            progressFill.style.height = `${progressPercent}%`;
+        }
+
+        let activeIndex = 0;
+        if (sectionProgresses.length > 0) {
+            sectionProgresses.forEach((sectionProgress, index) => {
+                if (sectionProgress <= progress + 0.0001) {
+                    activeIndex = index;
+                }
+            });
+        }
+
+        buttons.forEach((button, index) => {
+            button.classList.toggle("is-active", index === activeIndex);
+        });
+    };
+
+    scrollIndicatorHandler = () => {
+        if (ticking) {
+            return;
+        }
+        ticking = true;
+        requestAnimationFrame(() => {
+            ticking = false;
+            update();
+        });
+    };
+
+    scrollIndicatorResizeHandler = () => {
+        syncButtonPositions();
+        update();
+    };
+
+    window.addEventListener("scroll", scrollIndicatorHandler);
+    window.addEventListener("resize", scrollIndicatorResizeHandler);
+    syncButtonPositions();
+    update();
 };
 
 const initTextStack = () => {
@@ -462,6 +620,7 @@ const loadPage = async (pageName, src) => {
         initPageInteractions();
         initTextStack();
         initScrollLottie();
+        initScrollIndicator();
         return;
     }
     try {
@@ -475,6 +634,7 @@ const loadPage = async (pageName, src) => {
         initPageInteractions();
         initTextStack();
         initScrollLottie();
+        initScrollIndicator();
     } catch (error) {
         pageContainer.textContent = `Unable to load ${pageName}.`;
     }
