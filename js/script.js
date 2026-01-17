@@ -34,6 +34,69 @@ const initPageInteractions = () => {
     });
 
     initRocketCarousel();
+    initTeamTitleScramble();
+};
+
+const initTeamTitleScramble = () => {
+    const teamSection = pageContainer?.querySelector(".page-team");
+    if (!teamSection) {
+        return;
+    }
+
+    const title = teamSection.querySelector(".section-title");
+    if (!title) {
+        return;
+    }
+
+    scrambleText(title);
+};
+
+const scrambleText = (element) => {
+    const original = element.textContent || "";
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const chars = original.split("");
+    let revealIndex = 0;
+    let cycles = 0;
+    const cyclesPerChar = 6;
+    const interval = 40;
+    const originalWidth = element.getBoundingClientRect().width;
+    if (originalWidth > 0) {
+        element.style.display = "inline-block";
+        element.style.whiteSpace = "nowrap";
+        element.style.width = `${originalWidth}px`;
+    }
+
+    const isLetter = (char) => /[A-Za-z]/.test(char);
+
+    const tick = () => {
+        while (revealIndex < chars.length && !isLetter(chars[revealIndex])) {
+            revealIndex += 1;
+        }
+
+        const next = chars.map((char, index) => {
+            if (index < revealIndex || !isLetter(char)) {
+                return char;
+            }
+            return letters[Math.floor(Math.random() * letters.length)];
+        });
+
+        element.textContent = next.join("");
+
+        if (revealIndex >= chars.length) {
+            element.textContent = original;
+            window.clearInterval(timer);
+            return;
+        }
+
+        cycles += 1;
+        if (cycles >= cyclesPerChar) {
+            cycles = 0;
+            revealIndex += 1;
+        }
+    };
+
+    const timer = window.setInterval(tick, interval);
+    tick();
 };
 
 const initRocketCarousel = () => {
@@ -87,7 +150,7 @@ const initRocketCarousel = () => {
     const statsWrap = rocketSection.querySelector("[data-rocket-stats]");
     const heroPanel = rocketSection.querySelector("[data-rocket-hero]");
     const carouselPanel = rocketSection.querySelector("[data-rocket-carousel]");
-    const thumbButtons = rocketSection.querySelectorAll("[data-rocket-thumb]");
+    const thumbButtons = rocketSection.querySelectorAll("[data-rocket-index]");
     const navButtons = rocketSection.querySelectorAll("[data-rocket-nav]");
 
     if (!nameEl || !descriptionEl || !imageEl || rockets.length === 0) {
@@ -114,19 +177,6 @@ const initRocketCarousel = () => {
         });
     };
 
-    const updateThumb = (button, rocket, position) => {
-        if (!button || !rocket) {
-            return;
-        }
-        const img = button.querySelector("img");
-        if (img) {
-            img.src = rocket.image;
-            img.alt = `${rocket.name} rocket preview`;
-        }
-        button.dataset.rocketIndex = position.toString();
-        button.classList.toggle("is-current", position === currentIndex);
-    };
-
     const updateRocket = (nextIndex) => {
         const count = rockets.length;
         currentIndex = (nextIndex + count) % count;
@@ -142,27 +192,14 @@ const initRocketCarousel = () => {
             carouselPanel.dataset.theme = theme;
         }
 
-        const prevIndex = (currentIndex - 1 + count) % count;
-        const nextIdx = (currentIndex + 1) % count;
-
         thumbButtons.forEach((button) => {
-            const slot = button.dataset.rocketThumb;
-            if (slot === "prev") {
-                updateThumb(button, rockets[prevIndex], prevIndex);
-            } else if (slot === "current") {
-                updateThumb(button, rocket, currentIndex);
-            } else if (slot === "next") {
-                updateThumb(button, rockets[nextIdx], nextIdx);
+            const index = Number.parseInt(button.dataset.rocketIndex || "", 10);
+            if (Number.isNaN(index)) {
+                return;
             }
+            button.classList.toggle("is-current", index === currentIndex);
         });
     };
-
-    navButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-            const direction = button.dataset.rocketNav;
-            updateRocket(direction === "next" ? currentIndex + 1 : currentIndex - 1);
-        });
-    });
 
     thumbButtons.forEach((button) => {
         button.addEventListener("click", () => {
@@ -171,6 +208,13 @@ const initRocketCarousel = () => {
                 return;
             }
             updateRocket(target);
+        });
+    });
+
+    navButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const direction = button.dataset.rocketNav;
+            updateRocket(direction === "next" ? currentIndex + 1 : currentIndex - 1);
         });
     });
 
