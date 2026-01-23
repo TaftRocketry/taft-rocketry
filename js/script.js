@@ -41,7 +41,8 @@ const initPageInteractions = () => {
 
 const initTeamTitleScramble = () => {
     const teamSection = pageContainer?.querySelector(".page-team");
-    if (!teamSection) {
+    const teamSection2 = pageContainer?.querySelector(".page-rockets");
+    if (!teamSection && !teamSection2) {
         return;
     }
 

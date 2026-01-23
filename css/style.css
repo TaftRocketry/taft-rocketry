@@ -185,12 +185,14 @@ body.has-scroll-indicator::-webkit-scrollbar {
 
 .title{
     padding-left: 10%;
-    padding-top: 40px;
+    padding-top: 40%;
     padding-bottom: 40px;
-    font-size: 5rem;
+    font-size: 8rem;
     margin: 0 0 12px;
     color: var(--accent);
     font-weight: 1000;
+    transform: translateX(-20%);
+    
 }
 
 .home-hero-wrap {
@@ -225,6 +227,7 @@ body.has-scroll-indicator::-webkit-scrollbar {
     order: 2;
     padding-right: 60px;
     padding-left: 0px;
+    transform: translateX(-10%);
 }
 .scroll-lottie {
     position: sticky;
@@ -390,9 +393,10 @@ body.has-scroll-indicator::-webkit-scrollbar {
 }
 
 .page-rockets {
-    gap: 28px;
+    gap: 32px;
     padding: 48px 6vw 80px;
     align-content: start;
+    background: radial-gradient(circle at top left, rgba(30, 40, 80, 0.22), transparent 55%);
 }
 
 .rocket-hero {
@@ -599,6 +603,38 @@ body.has-scroll-indicator::-webkit-scrollbar {
     padding: 48px 6vw 90px;
     align-content: start;
     background: radial-gradient(circle at top right, rgba(80, 30, 30, 0.2), transparent 55%);
+}
+
+.page-themed {
+    position: relative;
+}
+
+.page-themed::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(120, 150, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(120, 150, 255, 0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.page-themed > * {
+    position: relative;
+    z-index: 1;
+}
+
+.rockets-header {
+    display: grid;
+    gap: 12px;
+    max-width: 720px;
+}
+
+.rockets-intro {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.6;
 }
 
 .sponsors-header {
