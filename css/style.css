@@ -910,8 +910,9 @@ footer {
     display: flex;
     justify-content: center; /* centers horizontally */
     align-items: center; /* centers vertically */
-    gap: 20vh; /* space between images */
+    gap: clamp(24px, 6vw, 80px); /* responsive spacing between images */
     flex-wrap: wrap;
+    padding-top: 10vh; /* lift the row slightly */
 }
 
     .sponsors-logos a {
@@ -928,10 +929,22 @@ footer {
     height: 200px;
     }
 
+.sponsors-logos > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .sponsor-logo {
     object-fit: contain;
     max-width: 80%;
     max-height: 80%;
+}
+
+.sponsor-logo--crop-right {
+    object-fit: cover;
+    object-position: left center;
+    width: 100%;
 }
 
 
