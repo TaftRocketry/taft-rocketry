@@ -630,6 +630,7 @@ const loadPage = async (pageName, src) => {
         initTextStack();
         initScrollLottie();
         initScrollIndicator();
+        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
         return;
     }
     try {
@@ -644,6 +645,7 @@ const loadPage = async (pageName, src) => {
         initTextStack();
         initScrollLottie();
         initScrollIndicator();
+        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     } catch (error) {
         pageContainer.textContent = `Unable to load ${pageName}.`;
     }
