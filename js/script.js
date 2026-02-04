@@ -41,17 +41,18 @@ const initPageInteractions = () => {
 
 const initTeamTitleScramble = () => {
     const teamSection = pageContainer?.querySelector(".page-team");
-    const teamSection2 = pageContainer?.querySelector(".page-rockets");
-    if (!teamSection && !teamSection2) {
+    const rocketsSection = pageContainer?.querySelector(".page-rockets");
+    const targetSection = teamSection || rocketsSection;
+    if (!targetSection) {
         return;
     }
 
-    const title = teamSection.querySelector(".section-title");
+    const title = targetSection.querySelector(".section-title");
     if (!title) {
         return;
     }
 
-    scrambleText(title);
+    //scrambleText(title);
 };
 
 const scrambleText = (element) => {
@@ -116,9 +117,12 @@ const initRocketCarousel = () => {
             image: "images/greengoblin.JPG",
             theme: "theme-goblin",
             stats: [
-                { label: "Apogee", value: "12,300 ft" },
-                { label: "Motor", value: "J-Class" },
-                { label: "Status", value: "Retired" },
+                { label: "Height", value: "4 ft" },
+                { label: "Diameter", value: "2.3 in" },
+                { label: "Weight", value: "1.2 kg" },
+                { label: "Motor", value: "Homemade" },
+                { label: "Max Speed", value: "Mach 0.45" },
+                { label: "Apogee", value: "4,000 ft" },
             ],
         },
         {
@@ -128,9 +132,12 @@ const initRocketCarousel = () => {
             image: "images/goldrush.JPG",
             theme: "theme-gold",
             stats: [
-                { label: "Apogee", value: "18,950 ft" },
-                { label: "Motor", value: "K-Class" },
-                { label: "Status", value: "Last Rocket" },
+                { label: "Height", value: "2.3 ft" },
+                { label: "Diameter", value: "1.5 in" },
+                { label: "Weight", value: "400 g" },
+                { label: "Motor", value: "Homemade" },
+                { label: "Max Speed", value: "Mach 0.1" },
+                { label: "Apogee", value: "500 ft" },
             ],
         },
         {
@@ -168,15 +175,16 @@ const initRocketCarousel = () => {
         }
         statsWrap.innerHTML = "";
         stats.forEach((stat) => {
-            const block = document.createElement("div");
-            block.className = "spec-block";
+            const row = document.createElement("div");
+            row.className = "spec-row";
             const label = document.createElement("span");
             label.className = "spec-label";
             label.textContent = stat.label;
-            const value = document.createElement("p");
+            const value = document.createElement("span");
+            value.className = "spec-value";
             value.textContent = stat.value;
-            block.append(label, value);
-            statsWrap.append(block);
+            row.append(label, value);
+            statsWrap.append(row);
         });
     };
 

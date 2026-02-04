@@ -1,57 +1,71 @@
 <section class="page page-rockets page-themed" data-page="rockets">
     <div class="rockets-header">
-        <h2 class="section-title">Rockets</h2>
+        <h2 class="section-title">OUR ROCKETS</h2>
         <p class="rockets-intro">
-            From retired flyers to our next vehicle, explore the builds that define Taft Rocketry.
+            Click through each flight article to see its mission focus, performance targets, and the story behind the
+            build.
         </p>
     </div>
-    <section class="rocket-hero panel" data-rocket-hero>
+
+    <div class="panel rocket-hero" data-rocket-hero data-theme="theme-goblin">
         <div class="rocket-info">
-            <p class="specs-label">Flight Hardware</p>
+            <span class="specs-label">Featured Vehicle</span>
             <h2 data-rocket-name>Green Goblin</h2>
             <p data-rocket-description>
                 A carbon-sleeved, high-impulse vehicle built for stability and clean staging with our current recovery
                 package.
             </p>
             <div class="rocket-stats" data-rocket-stats>
-                <div class="spec-block">
-                    <span class="spec-label">Apogee</span>
-                    <p>12,300 ft</p>
+                <div class="spec-row">
+                    <span class="spec-label">Height</span>
+                    <span class="spec-value">4 ft</span>
                 </div>
-                <div class="spec-block">
+                <div class="spec-row">
+                    <span class="spec-label">Diameter</span>
+                    <span class="spec-value">2.3 in</span>
+                </div>
+                <div class="spec-row">
+                    <span class="spec-label">Weight</span>
+                    <span class="spec-value">1.2 kg</span>
+                </div>
+                <div class="spec-row">
                     <span class="spec-label">Motor</span>
-                    <p>J-Class</p>
+                    <span class="spec-value">Homemade</span>
                 </div>
-                <div class="spec-block">
-                    <span class="spec-label">Status</span>
-                    <p>Retired</p>
+                <div class="spec-row">
+                    <span class="spec-label">Max Speed</span>
+                    <span class="spec-value">Mach 0.45</span>
+                </div>
+                <div class="spec-row">
+                    <span class="spec-label">Apogee</span>
+                    <span class="spec-value">4,000 ft</span>
                 </div>
             </div>
         </div>
         <div class="rocket-media">
             <img data-rocket-image src="images/greengoblin.JPG" alt="Green Goblin rocket" />
         </div>
-    </section>
+    </div>
 
-    <section class="rocket-carousel panel" data-rocket-carousel>
-        <div class="rocket-thumbs" data-rocket-thumbs>
-            <button class="rocket-thumb" type="button" data-rocket-index="0">
-                <img src="images/greengoblin.JPG" alt="Green Goblin rocket preview" />
+    <div class="panel rocket-carousel" data-rocket-carousel data-theme="theme-goblin">
+        <div class="rocket-thumbs">
+            <button class="rocket-thumb is-current" type="button" data-rocket-index="0" aria-label="Green Goblin">
+                <img src="images/greengoblin.JPG" alt="Green Goblin rocket" />
             </button>
-            <button class="rocket-thumb" type="button" data-rocket-index="1">
-                <img src="images/goldrush.JPG" alt="Gold Rush rocket preview" />
+            <button class="rocket-thumb" type="button" data-rocket-index="1" aria-label="Gold Rush">
+                <img src="images/goldrush.JPG" alt="Gold Rush rocket" />
             </button>
-            <button class="rocket-thumb" type="button" data-rocket-index="2">
-                <img src="images/rocketlatest.png" alt="Next Vehicle rocket preview" />
+            <button class="rocket-thumb" type="button" data-rocket-index="2" aria-label="Next Vehicle">
+                <img src="images/rocketlatest.png" alt="Next Vehicle rocket" />
             </button>
         </div>
         <div class="rocket-controls">
             <button class="rocket-arrow" type="button" data-rocket-nav="prev" aria-label="Previous rocket">
-                &#8592;
+                ←
             </button>
             <button class="rocket-arrow" type="button" data-rocket-nav="next" aria-label="Next rocket">
-                &#8594;
+                →
             </button>
         </div>
-    </section>
+    </div>
 </section>
