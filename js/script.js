@@ -291,6 +291,8 @@ const initScrollIndicator = () => {
         }
         const rect = textStack.getBoundingClientRect();
         const stackTop = window.scrollY + rect.top;
+
+       
         const stackHeight = rect.height || 1;
         const fallbackSegment = stackHeight / textBoxes.length;
         return { stackTop, stackHeight, fallbackSegment };
@@ -351,6 +353,7 @@ const initScrollIndicator = () => {
         if (progressFill) {
             progressFill.style.height = `${progressPercent}%`;
         }
+        
 
         let activeIndex = 0;
         if (sectionProgresses.length > 0) {
@@ -474,7 +477,7 @@ const initScrollLottie = () => {
     }
 
     const textStack = pageContainer?.querySelector(".text-stack");
-    const frameCount = 381;
+    const frameCount = 552;
     const imageCache = new Map();
     const queued = new Set();
     const loadQueue = [];
@@ -485,6 +488,7 @@ const initScrollLottie = () => {
     let lastDrawn = -1;
     let cssWidth = 0;
     let cssHeight = 0;
+    const verticalOverflow = 240;
 
     lottieHost.innerHTML = "";
     const canvas = document.createElement("canvas");
@@ -499,7 +503,9 @@ const initScrollLottie = () => {
     const updateCanvasSize = () => {
         const rect = lottieHost.getBoundingClientRect();
         cssWidth = Math.max(1, rect.width);
-        cssHeight = Math.max(1, rect.height);
+        cssHeight = Math.max(1, rect.height + verticalOverflow);
+        canvas.style.height = `calc(100% + ${verticalOverflow}px)`;
+        canvas.style.transform = `translateY(${-verticalOverflow / 2}px)`;
         const dpr = window.devicePixelRatio || 1;
         canvas.width = Math.floor(cssWidth * dpr);
         canvas.height = Math.floor(cssHeight * dpr);
@@ -510,16 +516,17 @@ const initScrollLottie = () => {
     };
 
     const drawFrame = (index) => {
+        // console.log(index);
         const image = imageCache.get(index);
         if (!image) {
             return;
         }
         context.clearRect(0, 0, cssWidth, cssHeight);
-        const scale = Math.max(cssWidth / image.width, cssHeight / image.height);
+        const scale = 1;
         const drawWidth = image.width * scale;
         const drawHeight = image.height * scale;
         const x = (cssWidth - drawWidth) / 2;
-        const y = (cssHeight - drawHeight) / 2;
+        const y = 70;
         context.drawImage(image, x, y, drawWidth, drawHeight);
         lastDrawn = index;
     };
@@ -546,7 +553,8 @@ const initScrollLottie = () => {
                 queued.delete(index);
                 processQueue();
             };
-            img.src = `lottie_images/img_${index}.jpg`;
+            const frameNumber = String(index + 1).padStart(6, "0");
+            img.src = `TestVid2/TestVid2_${frameNumber}.jpg`;
         }
     };
 
@@ -576,8 +584,9 @@ const initScrollLottie = () => {
             const rect = textStack.getBoundingClientRect();
             const start = window.scrollY + rect.top;
             const height = rect.height || 1;
-            const anchor = window.scrollY + viewportHeight / 2;
-            progress = Math.min(1, Math.max(0, (anchor - start) / height));
+            const scrollRange = Math.max(1, height - viewportHeight);
+            const anchor = window.scrollY;
+            progress = Math.min(1, Math.max(0, (anchor - start) / scrollRange));
         } else {
             const scrollable = Math.max(1, document.body.scrollHeight - viewportHeight);
             progress = Math.min(1, Math.max(0, window.scrollY / scrollable));
