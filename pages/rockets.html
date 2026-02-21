@@ -43,20 +43,41 @@
             </div>
         </div>
         <div class="rocket-media">
-            <img data-rocket-image src="images/greengoblin.JPG" alt="Green Goblin rocket" />
+            <img
+                data-rocket-image
+                src="images/greengoblin.JPG"
+                alt="Green Goblin rocket"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async" />
         </div>
     </div>
 
     <div class="panel rocket-carousel" data-rocket-carousel data-theme="theme-goblin">
         <div class="rocket-thumbs">
             <button class="rocket-thumb is-current" type="button" data-rocket-index="0" aria-label="Green Goblin">
-                <img src="images/greengoblin.JPG" alt="Green Goblin rocket" />
+                <img
+                    src="images/greengoblin.JPG"
+                    alt="Green Goblin rocket"
+                    loading="lazy"
+                    fetchpriority="low"
+                    decoding="async" />
             </button>
             <button class="rocket-thumb" type="button" data-rocket-index="1" aria-label="Gold Rush">
-                <img src="images/goldrush.JPG" alt="Gold Rush rocket" />
+                <img
+                    src="images/goldrush.JPG"
+                    alt="Gold Rush rocket"
+                    loading="lazy"
+                    fetchpriority="low"
+                    decoding="async" />
             </button>
             <button class="rocket-thumb" type="button" data-rocket-index="2" aria-label="Next Vehicle">
-                <img src="images/rocketlatest.png" alt="Next Vehicle rocket" />
+                <img
+                    src="images/rocketlatest.png"
+                    alt="Next Vehicle rocket"
+                    loading="lazy"
+                    fetchpriority="low"
+                    decoding="async" />
             </button>
         </div>
         <div class="rocket-controls">

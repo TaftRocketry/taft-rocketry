@@ -168,6 +168,27 @@ const initRocketCarousel = () => {
     }
 
     let currentIndex = 0;
+    const imagePreloadPromises = new Map();
+
+    const preloadRocketImage = (src, priority = "auto") => {
+        if (imagePreloadPromises.has(src)) {
+            return imagePreloadPromises.get(src);
+        }
+
+        const promise = new Promise((resolve) => {
+            const preload = new Image();
+            preload.decoding = "async";
+            if ("fetchPriority" in preload) {
+                preload.fetchPriority = priority;
+            }
+            preload.onload = () => resolve(true);
+            preload.onerror = () => resolve(false);
+            preload.src = src;
+        });
+
+        imagePreloadPromises.set(src, promise);
+        return promise;
+    };
 
     const renderStats = (stats) => {
         if (!statsWrap) {
@@ -194,6 +215,10 @@ const initRocketCarousel = () => {
         const rocket = rockets[currentIndex];
         nameEl.textContent = rocket.name;
         descriptionEl.textContent = rocket.description;
+        imageEl.decoding = "async";
+        if ("fetchPriority" in imageEl) {
+            imageEl.fetchPriority = "high";
+        }
         imageEl.src = rocket.image;
         imageEl.alt = `${rocket.name} rocket`;
         renderStats(rocket.stats);
@@ -227,6 +252,10 @@ const initRocketCarousel = () => {
             const direction = button.dataset.rocketNav;
             updateRocket(direction === "next" ? currentIndex + 1 : currentIndex - 1);
         });
+    });
+
+    rockets.forEach((rocket, index) => {
+        preloadRocketImage(rocket.image, index === 0 ? "high" : "auto");
     });
 
     updateRocket(0);
