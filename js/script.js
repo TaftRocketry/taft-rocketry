@@ -481,11 +481,17 @@ const initScrollLottie = () => {
     const imageCache = new Map();
     const queued = new Set();
     const loadQueue = [];
+    const priorityLoadQueue = [];
     const maxConcurrentLoads = 6;
     const prefetchRadius = 6;
+    const initialPreloadFrames = 48;
+    const minReadyFrames = 24;
     let activeLoads = 0;
     let lastFrame = -1;
     let lastDrawn = -1;
+    let pendingFrame = 0;
+    let scrollSyncReady = false;
+    let initialLoadedCount = 0;
     let cssWidth = 0;
     let cssHeight = 0;
     const verticalOverflow = 240;
@@ -532,8 +538,8 @@ const initScrollLottie = () => {
     };
 
     const processQueue = () => {
-        while (activeLoads < maxConcurrentLoads && loadQueue.length > 0) {
-            const index = loadQueue.shift();
+        while (activeLoads < maxConcurrentLoads && (priorityLoadQueue.length > 0 || loadQueue.length > 0)) {
+            const index = priorityLoadQueue.length > 0 ? priorityLoadQueue.shift() : loadQueue.shift();
             if (index === undefined) {
                 return;
             }
@@ -543,8 +549,19 @@ const initScrollLottie = () => {
                 activeLoads -= 1;
                 queued.delete(index);
                 imageCache.set(index, img);
+                if (index < initialPreloadFrames) {
+                    initialLoadedCount += 1;
+                }
+                if (!scrollSyncReady && initialLoadedCount >= minReadyFrames) {
+                    scrollSyncReady = true;
+                    lastFrame = -1;
+                    updateFrame();
+                }
                 if (index === lastFrame) {
                     drawFrame(index);
+                }
+                if (lastDrawn < 0 && imageCache.has(0)) {
+                    drawFrame(0);
                 }
                 processQueue();
             };
@@ -554,11 +571,14 @@ const initScrollLottie = () => {
                 processQueue();
             };
             const frameNumber = String(index + 1).padStart(6, "0");
+            if ("fetchPriority" in img) {
+                img.fetchPriority = index < initialPreloadFrames ? "high" : "auto";
+            }
             img.src = `TestVid2/TestVid2_${frameNumber}.jpg`;
         }
     };
 
-    const queueFrame = (index) => {
+    const queueFrame = (index, priority = false) => {
         if (index < 0 || index >= frameCount) {
             return;
         }
@@ -566,13 +586,17 @@ const initScrollLottie = () => {
             return;
         }
         queued.add(index);
-        loadQueue.push(index);
+        if (priority) {
+            priorityLoadQueue.push(index);
+        } else {
+            loadQueue.push(index);
+        }
         processQueue();
     };
 
-    const queueRange = (center) => {
+    const queueRange = (center, priority = false) => {
         for (let i = center - prefetchRadius; i <= center + prefetchRadius; i += 1) {
-            queueFrame(i);
+            queueFrame(i, priority);
         }
     };
 
@@ -593,15 +617,25 @@ const initScrollLottie = () => {
         }
 
         const frameIndex = Math.round(progress * (frameCount - 1));
+        pendingFrame = frameIndex;
+        queueRange(frameIndex, !scrollSyncReady);
+
+        if (!scrollSyncReady) {
+            if (imageCache.has(0)) {
+                drawFrame(0);
+            }
+            return;
+        }
+
         if (frameIndex === lastFrame) {
             return;
         }
         lastFrame = frameIndex;
-        queueRange(frameIndex);
         if (imageCache.has(frameIndex)) {
             drawFrame(frameIndex);
         } else if (lastDrawn >= 0 && imageCache.has(lastDrawn)) {
             drawFrame(lastDrawn);
+            queueFrame(pendingFrame, true);
         }
     };
 
@@ -623,7 +657,10 @@ const initScrollLottie = () => {
     };
 
     updateCanvasSize();
-    queueRange(0);
+    for (let i = 0; i < initialPreloadFrames; i += 1) {
+        queueFrame(i, true);
+    }
+    queueRange(0, true);
     window.addEventListener("scroll", lottieHandler);
     window.addEventListener("resize", lottieResizeHandler);
     lottieHandler();
