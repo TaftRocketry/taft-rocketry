@@ -101,18 +101,16 @@ const initPageInteractions = () => {
 
 const initTeamTitleScramble = () => {
     const teamSection = pageContainer?.querySelector(".page-team");
-    const rocketsSection = pageContainer?.querySelector(".page-rockets");
-    const targetSection = teamSection || rocketsSection;
-    if (!targetSection) {
+    if (!teamSection) {
         return;
     }
 
-    const title = targetSection.querySelector(".section-title");
+    const title = teamSection.querySelector(".section-title");
     if (!title) {
         return;
     }
 
-    //scrambleText(title);
+    scrambleText(title);
 };
 
 const scrambleText = (element) => {
@@ -122,7 +120,7 @@ const scrambleText = (element) => {
     let revealIndex = 0;
     let cycles = 0;
     const cyclesPerChar = 6;
-    const interval = 40;
+    const interval = 38;
     const originalWidth = element.getBoundingClientRect().width;
     if (originalWidth > 0) {
         element.style.display = "inline-block";
