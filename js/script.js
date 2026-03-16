@@ -6,6 +6,66 @@ let lottieHandler = null;
 let lottieResizeHandler = null;
 let scrollIndicatorHandler = null;
 let scrollIndicatorResizeHandler = null;
+const scrollLottieFrameCount = 552;
+const scrollLottieFrameCache = new Map();
+let scrollLottiePreloadPromise = null;
+let scrollLottieInitToken = 0;
+
+const preloadScrollLottieFrames = () => {
+    if (scrollLottieFrameCache.size === scrollLottieFrameCount) {
+        return Promise.resolve(scrollLottieFrameCache);
+    }
+
+    if (scrollLottiePreloadPromise) {
+        return scrollLottiePreloadPromise;
+    }
+
+    const maxConcurrentLoads = 12;
+    let nextIndex = 0;
+
+    const loadFrame = (index) => {
+        if (scrollLottieFrameCache.has(index)) {
+            return Promise.resolve();
+        }
+
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.decoding = "async";
+            if ("fetchPriority" in img) {
+                img.fetchPriority = index < 48 ? "high" : "auto";
+            }
+            img.onload = () => {
+                scrollLottieFrameCache.set(index, img);
+                resolve();
+            };
+            img.onerror = () => {
+                reject(new Error(`Failed to load scroll Lottie frame ${index + 1}`));
+            };
+
+            const frameNumber = String(index + 1).padStart(6, "0");
+            img.src = `TestVid2/TestVid2_${frameNumber}.jpg`;
+        });
+    };
+
+    const worker = async () => {
+        while (nextIndex < scrollLottieFrameCount) {
+            const index = nextIndex;
+            nextIndex += 1;
+            await loadFrame(index);
+        }
+    };
+
+    scrollLottiePreloadPromise = Promise.all(
+        Array.from({ length: Math.min(maxConcurrentLoads, scrollLottieFrameCount) }, () => worker())
+    )
+        .then(() => scrollLottieFrameCache)
+        .catch((error) => {
+            scrollLottiePreloadPromise = null;
+            throw error;
+        });
+
+    return scrollLottiePreloadPromise;
+};
 
 const setActiveLink = (link) => {
     if (!navLinks) {
@@ -491,6 +551,8 @@ const initTextStack = () => {
 };
 
 const initScrollLottie = () => {
+    const initToken = ++scrollLottieInitToken;
+
     if (lottieHandler) {
         window.removeEventListener("scroll", lottieHandler);
         lottieHandler = null;
@@ -506,25 +568,13 @@ const initScrollLottie = () => {
     }
 
     const textStack = pageContainer?.querySelector(".text-stack");
-    const frameCount = 552;
-    const imageCache = new Map();
-    const queued = new Set();
-    const loadQueue = [];
-    const priorityLoadQueue = [];
-    const maxConcurrentLoads = 6;
-    const prefetchRadius = 6;
-    const initialPreloadFrames = 48;
-    const minReadyFrames = 24;
-    let activeLoads = 0;
     let lastFrame = -1;
-    let lastDrawn = -1;
-    let pendingFrame = 0;
-    let scrollSyncReady = false;
-    let initialLoadedCount = 0;
     let cssWidth = 0;
     let cssHeight = 0;
     const verticalOverflow = 240;
 
+    lottieHost.classList.add("is-loading");
+    lottieHost.classList.remove("is-ready");
     lottieHost.innerHTML = "";
     const canvas = document.createElement("canvas");
     canvas.className = "scroll-lottie-canvas";
@@ -551,8 +601,7 @@ const initScrollLottie = () => {
     };
 
     const drawFrame = (index) => {
-        // console.log(index);
-        const image = imageCache.get(index);
+        const image = scrollLottieFrameCache.get(index);
         if (!image) {
             return;
         }
@@ -563,70 +612,6 @@ const initScrollLottie = () => {
         const x = (cssWidth - drawWidth) / 2;
         const y = 70;
         context.drawImage(image, x, y, drawWidth, drawHeight);
-        lastDrawn = index;
-    };
-
-    const processQueue = () => {
-        while (activeLoads < maxConcurrentLoads && (priorityLoadQueue.length > 0 || loadQueue.length > 0)) {
-            const index = priorityLoadQueue.length > 0 ? priorityLoadQueue.shift() : loadQueue.shift();
-            if (index === undefined) {
-                return;
-            }
-            activeLoads += 1;
-            const img = new Image();
-            img.onload = () => {
-                activeLoads -= 1;
-                queued.delete(index);
-                imageCache.set(index, img);
-                if (index < initialPreloadFrames) {
-                    initialLoadedCount += 1;
-                }
-                if (!scrollSyncReady && initialLoadedCount >= minReadyFrames) {
-                    scrollSyncReady = true;
-                    lastFrame = -1;
-                    updateFrame();
-                }
-                if (index === lastFrame) {
-                    drawFrame(index);
-                }
-                if (lastDrawn < 0 && imageCache.has(0)) {
-                    drawFrame(0);
-                }
-                processQueue();
-            };
-            img.onerror = () => {
-                activeLoads -= 1;
-                queued.delete(index);
-                processQueue();
-            };
-            const frameNumber = String(index + 1).padStart(6, "0");
-            if ("fetchPriority" in img) {
-                img.fetchPriority = index < initialPreloadFrames ? "high" : "auto";
-            }
-            img.src = `TestVid2/TestVid2_${frameNumber}.jpg`;
-        }
-    };
-
-    const queueFrame = (index, priority = false) => {
-        if (index < 0 || index >= frameCount) {
-            return;
-        }
-        if (imageCache.has(index) || queued.has(index)) {
-            return;
-        }
-        queued.add(index);
-        if (priority) {
-            priorityLoadQueue.push(index);
-        } else {
-            loadQueue.push(index);
-        }
-        processQueue();
-    };
-
-    const queueRange = (center, priority = false) => {
-        for (let i = center - prefetchRadius; i <= center + prefetchRadius; i += 1) {
-            queueFrame(i, priority);
-        }
     };
 
     const updateFrame = () => {
@@ -645,27 +630,13 @@ const initScrollLottie = () => {
             progress = Math.min(1, Math.max(0, window.scrollY / scrollable));
         }
 
-        const frameIndex = Math.round(progress * (frameCount - 1));
-        pendingFrame = frameIndex;
-        queueRange(frameIndex, !scrollSyncReady);
-
-        if (!scrollSyncReady) {
-            if (imageCache.has(0)) {
-                drawFrame(0);
-            }
-            return;
-        }
+        const frameIndex = Math.round(progress * (scrollLottieFrameCount - 1));
 
         if (frameIndex === lastFrame) {
             return;
         }
         lastFrame = frameIndex;
-        if (imageCache.has(frameIndex)) {
-            drawFrame(frameIndex);
-        } else if (lastDrawn >= 0 && imageCache.has(lastDrawn)) {
-            drawFrame(lastDrawn);
-            queueFrame(pendingFrame, true);
-        }
+        drawFrame(frameIndex);
     };
 
     let ticking = false;
@@ -686,13 +657,27 @@ const initScrollLottie = () => {
     };
 
     updateCanvasSize();
-    for (let i = 0; i < initialPreloadFrames; i += 1) {
-        queueFrame(i, true);
-    }
-    queueRange(0, true);
-    window.addEventListener("scroll", lottieHandler);
-    window.addEventListener("resize", lottieResizeHandler);
-    lottieHandler();
+    preloadScrollLottieFrames()
+        .then(() => {
+            if (initToken !== scrollLottieInitToken || !lottieHost.isConnected) {
+                return;
+            }
+
+            lottieHost.classList.remove("is-loading");
+            lottieHost.classList.add("is-ready");
+            drawFrame(0);
+            window.addEventListener("scroll", lottieHandler);
+            window.addEventListener("resize", lottieResizeHandler);
+            lottieHandler();
+        })
+        .catch(() => {
+            if (initToken !== scrollLottieInitToken || !lottieHost.isConnected) {
+                return;
+            }
+
+            lottieHost.classList.add("is-loading");
+            lottieHost.classList.remove("is-ready");
+        });
 };
 
 const loadPage = async (pageName, src) => {
