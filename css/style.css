@@ -853,12 +853,14 @@ body.has-scroll-indicator::-webkit-scrollbar {
 .sponsor-meta h3 {
     margin: 0;
     font-size: 1.1rem;
+    text-align: center;
 }
 
 .sponsor-meta p {
     margin: 6px 0 0;
     color: var(--muted);
     font-size: 0.9rem;
+    text-align: center;
 }
 
 .page-team::before {
